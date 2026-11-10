@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
-public class main {
-    public static void Main(String[] args) {
+public class Main {
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean rodando = true;
 
@@ -20,7 +20,7 @@ public class main {
             try {
                 opcao = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println(" Por favor, digite um número válido.");
+                System.out.println("Por favor, digite um número válido.");
                 continue;
             }
 
@@ -52,14 +52,14 @@ public class main {
         try {
             medicao = Double.parseDouble(scanner.nextLine());
         } catch (NumberFormatException e) {
-            System.out.println(" Valor de medição inválido.");
+            System.out.println("Valor de medição inválido.");
             return;
         }
 
         if (medicao >= 10.0 && medicao <= 20.0) {
             System.out.println("Status: APTO. Medição dentro dos parâmetros aceitáveis.");
         } else {
-            System.out.println(" Status: BLOQUEADO. Medição fora do intervalo (10 a 20).");
+            System.out.println("Status: BLOQUEADO. Medição fora do intervalo (10 a 20).");
             System.out.print("Justificativa obrigatória para bloqueio: ");
             String justificativa = scanner.nextLine();
             
