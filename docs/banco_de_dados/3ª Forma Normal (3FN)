@@ -1,0 +1,6 @@
+### 3ª Forma Normal (3FN)
+
+- **Atendimento à 2FN:** Todas as tabelas atendem aos requisitos da Segunda Forma Normal.
+- **Ausência de Dependências Transitivas:** Os atributos não-chave dependem diretamente das respectivas chaves primárias.
+- **Separação de Entidades:** Os dados dos equipamentos e dos responsáveis são armazenados em suas próprias tabelas, evitando duplicidade de informações.
+- **Relacionamentos por Chaves Estrangeiras:** A tabela INSPECAO utiliza `id_equipamento` e `id_responsavel` como chaves estrangeiras para relacionar as informações, mantendo a integridade dos dados.
