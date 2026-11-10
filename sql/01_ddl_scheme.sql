@@ -1,20 +1,17 @@
 CREATE DATABASE IF NOT EXISTS equipcheck_db;
 USE equipcheck_db;
 
--- Tabela de Responsáveis (RF05)
 CREATE TABLE responsavel (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL
 );
 
--- Tabela de Equipamentos (RF01)
 CREATE TABLE equipamento (
     id_equipamento VARCHAR(50) PRIMARY KEY,
     versao_firmware VARCHAR(20) NOT NULL,
     versao_software VARCHAR(20) NOT NULL
 );
 
--- Tabela de Inspeções (RF02, RF03, RF05, RF06)
 CREATE TABLE inspecao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_equipamento VARCHAR(50) NOT NULL,

@@ -56,7 +56,6 @@ public class main {
             return;
         }
 
-        // Validação da regra de negócio central (Medição entre 10 e 20)
         if (medicao >= 10.0 && medicao <= 20.0) {
             System.out.println("Status: APTO. Medição dentro dos parâmetros aceitáveis.");
         } else {
