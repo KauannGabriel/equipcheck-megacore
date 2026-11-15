@@ -1,88 +1,109 @@
-# EquipCheck Mini
+EquipCheck Mini
 
-Aplicativo de apoio ao registro de equipamentos e inspeções da **MegaCore Labs**, permitindo acompanhar a condição de liberação de cada equipamento, as versões de firmware e software associadas e o histórico de verificações e mudanças.
+Banco de dados e aplicação de apoio ao registro de equipamentos e inspeções da MegaCore Labs, permitindo acompanhar a condição de liberação de cada equipamento, as versões de firmware e software associadas e o histórico das verificações e mudanças.
 
-> Projeto A3 — Garantia da Qualidade de Software (UNA) · Cenário 5 MegaCore Labs
+Trabalho A3 integrado — Bancos de Dados e Garantia da Qualidade de Software · UNA Betim · Cenário 5 MegaCore Labs
 
-## Contexto
+Bancos de Dados: entrega em 30/11 (documentação, diagramas, scripts SQL, vídeo pitch).
+Garantia da Qualidade de Software: três etapas (diagnóstico e AS-IS; app e testes; TO-BE e melhorias); datas divulgadas pelos professores.
+Equipe
+Integrantes
+Kauan Gabriel
+Rafaela Oliveira
+Eric Braga
+Thays Durães
 
-A MegaCore Labs, de Campinas, desenvolve software embarcado e aplicações de configuração para equipamentos médicos e industriais. Seus clientes exigem documentação e histórico das verificações. Firmware e aplicativo de configuração são produzidos por equipes diferentes, e uma combinação incompatível de versões pode levar a falhas de classificação: em um teste interno, uma combinação de firmware e aplicativo mostrou um equipamento como apto apesar de existir uma condição de bloqueio.
+Vídeo pitch
 
-O EquipCheck Mini existe para registrar essas inspeções com rastreabilidade, preservando os controles necessários e a possibilidade de reconstruir o histórico de uma liberação.
+Link: inserir o link do vídeo (roteiro em video/link-do-pitch.md)
 
-### Indicadores fornecidos pela empresa (valores fictícios)
+Contexto
 
-| Indicador | Valor |
-|-----------|-------|
-| Tempo de uma versão até liberação | 16 semanas |
-| Tempo gasto em espera | 27% do tempo total |
-| Requisitos ligados a testes | 95% |
+A MegaCore Labs, de Campinas, desenvolve software embarcado e aplicações de configuração para equipamentos médicos e industriais. Firmware e aplicativo são produzidos por equipes diferentes e, em um teste interno, uma combinação de versões mostrou um equipamento como apto apesar de existir uma condição de bloqueio. O EquipCheck Mini registra inspeções com rastreabilidade, preservando os controles necessários e a possibilidade de reconstruir o histórico de uma liberação.
 
-Esses dados sustentam o diagnóstico junto com o relato do cenário, mas não determinam sozinhos a causa dos problemas.
+Requisitos funcionais
+ID	Requisito
+RF01	Cadastrar equipamento com identificador único e versões de firmware e software obrigatórias.
+RF02	Registrar uma medição numérica em inspeção, usando a faixa didática de 10 a 20, incluindo os extremos.
+RF03	Classificar como Bloqueado se a medição estiver fora da faixa; dentro dela, classificar como Apto.
+RF04	Permitir que um equipamento Bloqueado volte a Apto somente após nova inspeção aprovada.
+RF05	Exigir responsável e justificativa para alteração de versão ou de dados da inspeção.
+RF06	Preservar o histórico de inspeções e mudanças, incluindo as versões de firmware e software associadas a cada registro.
+Documentação
+Entregável	Arquivo
+Escopo do projeto	docs/escopo.md
+Lista de funcionalidades	docs/funcionalidades.md
+Levantamento de requisitos	docs/requisitos.md
+Diagrama de caso de uso	docs/caso-de-uso.md
+DER conceitual	docs/der.md
+Modelo relacional em 3FN	docs/modelo-relacional.md
+Normalização e justificativas	docs/normalizacao.md
+Dicionário de dados (bônus)	docs/dicionario-de-dados.md
+Plano de desenvolvimento	ROADMAP.md
+Garantia da Qualidade de Software
+Etapa	Entregável	Arquivo
+1	Diagnóstico e problemas prioritários	qualidade/01-diagnostico.md
+1	AS-IS em BPMN	qualidade/02-as-is.md
+1	Maturidade e relação com MPS.BR e CMMI	qualidade/03-maturidade.md
+1	Requisitos com critérios de aceite	docs/requisitos.md
+2	Plano de testes, riscos e casos de teste	qualidade/04-plano-de-testes.md
+2	Defeitos controlados, TDD e CI	qualidade/05-defeitos-tdd-ci.md
+2 e 3	Rastreabilidade requisito, risco, teste, defeito e melhoria	qualidade/06-rastreabilidade.md
+3	TO-BE, melhorias, maturidade comparada e indicadores	qualidade/07-to-be-e-melhorias.md
 
-## Requisitos funcionais
+Os arquivos em qualidade/ são a base dos relatórios; as colunas marcadas como "a preencher" dependem das execuções do grupo.
 
-| ID | Requisito |
-|----|-----------|
-| RF01 | Cadastrar equipamento com identificador único e versões de firmware e software obrigatórias. |
-| RF02 | Registrar uma medição numérica em inspeção, usando a faixa didática de 10 a 20, incluindo os extremos. |
-| RF03 | Classificar como **Bloqueado** se a medição estiver fora da faixa; dentro dela, classificar como **Apto**. |
-| RF04 | Permitir que um equipamento Bloqueado volte a Apto somente após nova inspeção aprovada. |
-| RF05 | Exigir responsável e justificativa para alteração de versão ou de dados da inspeção. |
-| RF06 | Preservar o histórico de inspeções e mudanças, incluindo as versões de firmware e software associadas a cada registro. |
+Como executar o banco
 
-## Modelo de dados
+Requer MySQL 8.0.16 ou superior (necessário para CHECK constraints aplicadas). Execute os scripts em ordem:
 
-| Tabela | Função |
-|--------|--------|
-| `equipamento` | Equipamento (`EQP-001`), versões atuais de firmware e software e status (Apto/Bloqueado). |
-| `inspecao` | Medição, classificação automática, aprovação, responsável e as versões vigentes no momento da inspeção. |
-| `historico_equipamento` | Toda mudança de versão: valores anteriores e novos, responsável, justificativa e data/hora. |
-| `historico_inspecao` | Toda correção de medição, aprovação ou observação, com responsável, justificativa e versões associadas. |
-| `v_status_atual_equipamento` (view) | Situação atual de cada equipamento com a última inspeção. |
+bash
+mysql -u root -p < sql/01-create-database.sql
+mysql -u root -p < sql/02-create-tables.sql
+mysql -u root -p < sql/03-triggers-views.sql
+mysql -u root -p < sql/04-inserts.sql
+mysql -u root -p < sql/05-queries.sql
 
-### Como cada requisito é garantido no banco
+No MySQL Workbench, abra cada arquivo e execute o script inteiro, na mesma ordem.
 
-| Requisito | Mecanismo |
-|-----------|-----------|
-| RF01 | Chave primária, `CHECK` no formato do ID e `CHECK` de versões não vazias. |
-| RF02 | `medicao DECIMAL(8,2) NOT NULL`. |
-| RF03 | `classificacao` é coluna gerada (`GENERATED ... STORED`): `BETWEEN 10.00 AND 20.00` é Apto, o resto é Bloqueado. |
-| RF04 | Triggers de `inspecao` atualizam `equipamento.status`: medição fora da faixa bloqueia; dentro da faixa só libera se `aprovada = 1`. |
-| RF05 | Triggers `BEFORE UPDATE` rejeitam alterações sem `responsavel_alteracao` e `justificativa_alteracao` (mín. 10 caracteres, diferente da anterior). |
-| RF06 | Triggers `AFTER INSERT/UPDATE` gravam nas tabelas de histórico; as versões são copiadas para cada inspeção; `DELETE` e `UPDATE` em históricos são bloqueados. |
+Script	Conteúdo
+01-create-database.sql	Criação do banco equipcheck
+02-create-tables.sql	Tabelas, chaves primárias e estrangeiras, CHECK
+03-triggers-views.sql	Triggers (RF04, RF05, RF06) e view de status atual
+04-inserts.sql	Dados de exemplo (5 equipamentos, inspeções, correções e mudanças de versão)
+05-queries.sql	12 consultas de demonstração e testes das regras
+Modelo de dados
+Tabela	Função
+equipamento	Equipamento (EQP-001), versões atuais e status (Apto/Bloqueado)
+inspecao	Medição, classificação automática, aprovação, responsável e versões vigentes na data
+historico_equipamento	Toda mudança de versão, com responsável e justificativa
+historico_inspecao	Toda correção de dados de inspeção, com responsável e justificativa
+v_status_atual_equipamento (view)	Situação atual de cada equipamento com a última inspeção
 
-### Premissas adotadas
+Diagramas: docs/caso-de-uso.png, docs/der.png e docs/modelo-relacional.png.
 
-- Equipamento recém-cadastrado nasce **Bloqueado** e só vira Apto após a primeira inspeção aprovada (escolha conservadora; o enunciado não define o estado inicial).
-- A aprovação é o campo `aprovada` da inspeção, alterado com responsável e justificativa (RF05) e registrado no histórico.
-- Apenas `medicao`, `aprovada` e `observacao` podem ser corrigidas em uma inspeção; equipamento, responsável original, data e versões são fixos.
-- Nenhum registro de equipamento ou inspeção pode ser excluído.
-
-## Tecnologias
-
-- Banco de dados: MySQL 8.0.16+ (necessário para `CHECK` constraints aplicadas)
-- Back-end: JavaScript (Node.js)
-- Front-end: React
-
-## Como executar
-
-```bash
-# Criar o banco, as tabelas, os triggers e a view
-mysql -u root -p < sql/01_schema.sql
-```
-
-O final do arquivo traz comandos de teste comentados (um por requisito) para validar as regras.
-
-## Estrutura do repositório
-
-```
+Tecnologias
+Banco de dados: MySQL 8.0.16+
+Back-end: JavaScript (Node.js), necessário para Garantia da Qualidade (regras testáveis, TDD, testes automatizados e CI)
+Interface: React (opcional; a avaliação aceita interface simples ou terminal)
+Estrutura do repositório
 .
 ├── README.md
-├── docs/        # modelo conceitual/lógico (DER)
-└── sql/         # 01_schema.sql: tabelas, restrições, triggers e view
-```
+├── ROADMAP.md
+├── docs/
+│   ├── escopo.md, funcionalidades.md, requisitos.md
+│   ├── caso-de-uso.md, der.md, modelo-relacional.md
+│   ├── normalizacao.md, dicionario-de-dados.md
+│   ├── caso-de-uso.png, der.png, modelo-relacional.png
+│   └── diagramas/        # fontes dos diagramas (Graphviz)
+├── qualidade/            # Garantia da Qualidade: diagnóstico, AS-IS, maturidade, testes, TO-BE
+│   ├── 01 a 07 (.md), as-is-bpmn.png
+│   └── diagramas/        # gerador do diagrama AS-IS
+├── sql/                  # scripts 01 a 05
+├── video/                # link e roteiro do pitch
+├── backend/              # regras de negócio em JavaScript, testes e API
+├── frontend/             # interface React (opcional)
+└── .github/workflows/    # CI (GitHub Actions)
+Licença
 
-## Licença
-
-_A definir._
+A definir.
