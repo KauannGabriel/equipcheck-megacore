@@ -4,14 +4,15 @@ Banco de dados e aplicação de apoio ao registro de equipamentos e inspeções 
 
 Trabalho A3 integrado — Bancos de Dados e Garantia da Qualidade de Software · UNA Betim · Cenário 5 MegaCore Labs
 
-Bancos de Dados: entrega em 30/11 (documentação, diagramas, scripts SQL, vídeo pitch).
-Garantia da Qualidade de Software: três etapas (diagnóstico e AS-IS; app e testes; TO-BE e melhorias); datas divulgadas pelos professores.
+Bancos de Dados: documentação, diagramas, scripts SQL, vídeo pitch.
+Garantia da Qualidade de Software: diagnóstico, AS-IS, app, testes, TO-BE, melhorias.
 Equipe
-Integrantes
-Kauan Gabriel
-Rafaela Oliveira
-Eric Braga
-Thays Durães
+Integrantes:
+Kauan Gabriel,
+Rafaela Oliveira,
+Eric Braga,
+Thays Durães,
+Lucas 
 
 Vídeo pitch
 
@@ -104,6 +105,3 @@ Estrutura do repositório
 ├── backend/              # regras de negócio em JavaScript, testes e API
 ├── frontend/             # interface React (opcional)
 └── .github/workflows/    # CI (GitHub Actions)
-Licença
-
-A definir.
