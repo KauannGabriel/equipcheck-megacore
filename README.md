@@ -16,7 +16,7 @@ Lucas
 
 Vídeo pitch
 
-Link: inserir o link do vídeo (roteiro em video/link-do-pitch.md)
+
 
 Contexto
 

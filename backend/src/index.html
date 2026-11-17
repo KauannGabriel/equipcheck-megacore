@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EquipCheck Mini - MegaCore Labs</title>
+    <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; margin: 0; padding: 2rem; display: flex; justify-content: center; }
+    .container { max-width: 720px; width: 100%; background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    h1 { margin-top: 0; font-size: 1.5rem; color: #38bdf8; }
+    p.subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: #cbd5e1; }
+    input, textarea { width: 100%; padding: 0.65rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 0.95rem; }
+    input:focus, textarea:focus { outline: none; border-color: #38bdf8; }
+    .full { grid-column: 1 / -1; }
+    button { background: #0284c7; color: #fff; border: none; padding: 0.75rem 1.25rem; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 0.5rem; }
+    button:hover { background: #0369a1; }
+    .alert { padding: 0.85rem; border-radius: 6px; margin-top: 1rem; font-size: 0.9rem; display: none; }
+    .alert.error { background: #7f1d1d; border: 1px solid #ef4444; color: #fecaca; display: block; }
+    .alert.success { background: #064e3b; border: 1px solid #10b981; color: #a7f3d0; display: block; }
+    .alert.blocked { background: #78350f; border: 1px solid #f59e0b; color: #fde68a; display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 0.65rem; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; }
+    .badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+    .apto { background: #059669; color: #fff; }
+    .bloqueado { background: #dc2626; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <h1>EquipCheck Mini — MegaCore Labs</h1>
+    <p class="subtitle">Validação automatizada de tolerância (10.0 a 20.0) e rastreabilidade imutável (RF01–RF06)</p>
+
+    <form id="formInspecao">
+        <div class="grid">
+        <div>
+          <label for="idEquipamento">ID do Equipamento (RF01) *</label>
+            <input type="text" id="idEquipamento" placeholder="Ex: EQ-1042" required />
+        </div>
+        <div>
+          <label for="operador">Operador Responsável *</label>
+            <input type="text" id="operador" placeholder="Ex: Kauan" required />
+        </div>
+        <div class="full">
+          <label for="medicao">Valor da Medição (Tolerância: 10.0 a 20.0) (RF02 / RF03) *</label>
+            <input type="number" id="medicao" step="0.01" placeholder="Ex: 15.5" required />
+        </div>
+        <div class="full">
+            <label for="justificativa">Justificativa Técnica (Obrigatória se fora de 10.0–20.0) (RF05)</label>
+            <textarea id="justificativa" rows="2" placeholder="Descreva o motivo caso o equipamento seja bloqueado..."></textarea>
+        </div>
+        </div>
+        <button type="submit">Registrar e Validar Inspeção</button>
+    </form>
+
+    <div id="feedback" class="alert"></div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Data/Hora</th>
+            <th>Equipamento</th>
+            <th>Medição</th>
+            <th>Status</th>
+            <th>Operador / Justificativa</th>
+        </tr>
+        </thead>
+        <tbody id="tabelaHistorico"></tbody>
+    </table>
+    </div>
+
+    <script>
+    // Histórico imutável em memória (RF06)
+    const historicoInspecoes = [];
+
+    // Regra de negócio pura (pronta para testes unitários na Etapa 2)
+    function avaliarInspecao({ idEquipamento, operador, medicao, justificativa }) {
+        if (!idEquipamento || !idEquipamento.trim()) {
+        return { valido: false, erro: "RF01: O ID do equipamento é obrigatório." };
+        }
+        if (!operador || !operador.trim()) {
+        return { valido: false, erro: "Operador responsável é obrigatório." };
+        }
+        if (typeof medicao !== "number" || Number.isNaN(medicao)) {
+        return { valido: false, erro: "RF02: Informe um valor numérico válido para a medição." };
+        }
+
+      // RF03 e RF04: Intervalo entre 10.0 e 20.0 -> APTO | Fora -> BLOQUEADO
+        const dentroDaTolerancia = medicao >= 10.0 && medicao <= 20.0;
+        const status = dentroDaTolerancia ? "APTO" : "BLOQUEADO";
+
+      // RF05: Justificativa obrigatória em caso de bloqueio
+        if (status === "BLOQUEADO" && (!justificativa || !justificativa.trim())) {
+        return {
+            valido: false,
+            erro: `RF05: Medição (${medicao}) fora da tolerância [10.0 - 20.0]. Justificativa obrigatória para bloqueio.`
+        };
+        }
+
+      // RF06: Registro imutável com timestamp
+        const registro = Object.freeze({
+        id: crypto.randomUUID(),
+        dataHora: new Date().toLocaleString("pt-BR"),
+        idEquipamento: idEquipamento.trim().toUpperCase(),
+        operador: operador.trim(),
+        medicao,
+        status,
+        justificativa: status === "APTO" ? (justificativa.trim() || "Dentro dos parâmetros") : justificativa.trim()
+        });
+
+        return { valido: true, registro };
+    }
+
+    const form = document.getElementById("formInspecao");
+    const feedback = document.getElementById("feedback");
+    const tbody = document.getElementById("tabelaHistorico");
+
+    function renderizarTabela() {
+        tbody.innerHTML = historicoInspecoes.map(item => `
+        <tr>
+            <td>${item.dataHora}</td>
+            <td><strong>${item.idEquipamento}</strong></td>
+            <td>${item.medicao.toFixed(2)}</td>
+            <td><span class="badge ${item.status === "APTO" ? "apto" : "bloqueado"}">${item.status}</span></td>
+            <td>${item.operador} — <em>${item.justificativa}</em></td>
+        </tr>
+        `).join("");
+    }
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const idEquipamento = document.getElementById("idEquipamento").value;
+        const operador = document.getElementById("operador").value;
+        const medicao = parseFloat(document.getElementById("medicao").value);
+        const justificativa = document.getElementById("justificativa").value;
+
+        const resultado = avaliarInspecao({ idEquipamento, operador, medicao, justificativa });
+
+        if (!resultado.valido) {
+        feedback.className = "alert error";
+        feedback.textContent = resultado.erro;
+        return;
+        }
+
+        historicoInspecoes.unshift(resultado.registro);
+        renderizarTabela();
+
+        if (resultado.registro.status === "APTO") {
+        feedback.className = "alert success";
+        feedback.textContent = `Equipamento ${resultado.registro.idEquipamento} aprovado (APTO) e registrado no histórico.`;
+        } else {
+        feedback.className = "alert blocked";
+        feedback.textContent = `Equipamento ${resultado.registro.idEquipamento} BLOQUEADO com justificativa registrada.`;
+        }
+
+        form.reset();
+    });
+    </script>
+</body>
+</html>
