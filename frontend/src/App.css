@@ -1,0 +1,76 @@
+.app {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+.app > h1 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.add-equipment {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.add-equipment h2 {
+  margin-bottom: 1.5rem;
+}
+
+.add-equipment form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-equipment label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.add-equipment input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font: inherit;
+  margin-bottom: 0.75rem;
+}
+
+.add-equipment input:focus {
+  outline: 2px solid #667eea;
+  border-color: transparent;
+}
+
+.add-equipment button {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: #667eea;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-equipment button:hover:not(:disabled) {
+  background: #5a6fd6;
+}
+
+.add-equipment button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.erro {
+  color: #c62828;
+  font-size: 0.875rem;
+}
+
+.sucesso {
+  color: #2e7d32;
+  font-size: 0.875rem;
+}
